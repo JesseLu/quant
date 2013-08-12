@@ -1,4 +1,8 @@
-function [x] = make_portfolio(mu)
+function [x] = gen_x(mu, eta)
+
+    if nargin == 1
+        eta = 0.2; % Default value.
+    end
 
     [c, ~, A, B, C] = sim_matrices();
     N = length(c); % N = m * n;
@@ -8,6 +12,7 @@ function [x] = make_portfolio(mu)
         variable x(N)
         minimize -(c'*x) + mu * std(A*x)
         subject to 
-            norm(x, 1) <= 1
-            norm(B*x, 1) <= 0.2
+            norm(x, 2) <= 1
+            norm(B*x, 2) <= eta 
     cvx_end
+

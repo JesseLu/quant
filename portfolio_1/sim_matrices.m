@@ -2,7 +2,7 @@
 function [c, a, A, B, C] = sim_matrices()
 
     % Load percentage returns.
-    percent_return = double(getfield(load('percent_return.mat'), 'percent_return'));
+    percent_return = double(getfield(load('data.mat'), 'percent_return'));
     [m, n] = size(percent_return); % m stocks over n days.
     pret = percent_return(:);
 

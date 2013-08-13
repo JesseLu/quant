@@ -4,6 +4,10 @@
 
 function [Y] = get_signals(h_size, num_ord)
 
+    if nargin == 1
+        num_ord = 1;
+    end
+
     R = double(getfield(load('data.mat'), 'percent_return'));
     [m, n] = size(R); % m stocks over n days.
 

@@ -1,7 +1,15 @@
-function [] = setup_problem(varargin)
+%% setup_problem
+% Compute the percent_return data from the price data and store it in data.mat.
+function [] = setup_problem(prices)
 
-    percent_return = double(getfield(load('percent_return.mat'), 'percent_return'));
-    if ~isempty(varargin) && length(varargin) == 2
-        percent_return = percent_return(1:varargin{1}, 1:varargin{2});
-    end
+    % Double precision needed for sparse matrices later.
+    prices = double(prices); 
+
+    % prices_m1 is prices minus one day (yesterday).
+	prices_m1= circshift(prices, [0 1]);
+	prices_m1(:, 1) = 0;
+
+    percent_return = (prices - prices_m1) ./ prices_m1;
+	percent_return(~isfinite(percent_return)) = 0;
+
     save('data.mat', 'percent_return');

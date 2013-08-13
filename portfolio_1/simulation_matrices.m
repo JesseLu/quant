@@ -1,5 +1,8 @@
-% Returns the matrices relevant to the portfolio simulation.
-function [c, a, A, B, C] = sim_matrices()
+%% simulation_matrices
+% Returns the linear algebra (vector, scalar, matrices) objects with
+% which we can mathematically describe our problem.
+
+function [c, a, A, B, C, X_dims] = sim_matrices()
 
     % Load percentage returns.
     percent_return = double(getfield(load('data.mat'), 'percent_return'));
@@ -19,3 +22,6 @@ function [c, a, A, B, C] = sim_matrices()
     % Matrix that sums up across days.
     i = repmat(1:n, [m 1]);
     C = sparse(i(:), 1:m*n, ones(m*n, 1), n, m*n);
+
+    % Portfolio dimensions.
+    X_dims = [m, n];

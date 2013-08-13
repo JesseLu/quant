@@ -3,7 +3,7 @@
 function [ir, ret, tvr] = simulate(p)
 
     % Load percentage returns.
-    percent_return = getfield(load('percent_return.mat'), 'percent_return');
+    percent_return = getfield(load('data.mat'), 'percent_return');
 
     % Portfolio from two days ago is used to calculate profit/loss.
     p_m2 = circshift(p, [0 2]);

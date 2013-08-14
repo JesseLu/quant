@@ -94,10 +94,27 @@
     We use the following two-part strategy for portfolio creation:
     \begin{enumerate}
         \I  Obtain a near-optimal forward-biased portfolio, which is then used to
-        \I  compute a reduced-order, backward-biased model which is used
+        \I  compute a reduced-order, backward-biased model which in turn is used
             to obtain a legitimate backward-biased portfolio.
     \end{enumerate}
+
+    More specifically, given a forward-biased portfolio $X_\text{FB}$,
+        we compute a reduced $q$-order model $M_q$ based on backward-biased data $Y$, such that
+    \E{}{M_q Y \approx X_\text{FB}.}
+    A legitimate, backward-biased portfolio $X$ is obtained as
+    \E{}{X = M_q Y.}
+    For the results presented in this report, $Y$ was simply 
+        the percent returns on stocks for the previous 5 days.
             
+\subsection{Testing forward-bias of of portfolios}
+    Unfortunately, the forward-bias of portfolios can not yet
+        be tested empirically.
+    This is because the computation of a near-optimal forward-biased portfolio
+        in the first step is quite computationally intensive.
+
+    However, inspection of the $Y$ matrix (see \verb+generate_Y.m+)
+        reveals that it does not contain forward-biased information
+        and so guarantees that $X = M_q Y$ is a backward-biased portfolio.
 
 
 
@@ -266,5 +283,18 @@
 
 \section{Conclusion}
     
+    We have produced a series of portfolios 
+        which exhibit both large annualized returns and 
+        large information ratios while
+        keeping the turnover percentage below 0.2.
 
+    We describe our portfolio-generation method,
+        which involves finding a near-optimal forward-biased portfolio
+        from which we obtain a reduced-order model.
+    It is this reduced-order model that then allows us to calculate
+        a legitimate backward-biased portfolio.
+
+    Lastly, we remark once again that although not empirically tested to
+        be backward-biased,
+        we guarantee such since the model uses only past data on percentage returns.
 \end{document}

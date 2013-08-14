@@ -3,7 +3,7 @@
 % different weightings (mu) between the information ratio and the annualized 
 % return.
 
-function [X_fb] = batch_solve_Xfb()
+function [X_fb, mu] = batch_solve_Xfb()
 
     % Range of mu and eta values to generate portfolios over
     mu = [0.0, 0.2, 0.4, 0.7, 1.0];

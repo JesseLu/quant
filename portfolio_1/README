@@ -1,0 +1,6 @@
+Results were obtained via
+
+setup_problem(prices);
+[X_fb, mu] = batch_solve_Xfb();
+[X, ir, ret, tvr] = batch_find_X(mu, X_fb, 5, 0.2);
+plot_results(ret, ir, tvr);

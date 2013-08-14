@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{hyperref}
 \input defs.tex
 
 \title{Project Report}
@@ -22,7 +23,11 @@
     These results are presented in figure~\ref{result},
         as well as tables~\ref{table:ret}-\ref{table:tvr}.
 
-    Surprisingly, these 
+    Surprisingly, these portfolios can exhibit large returns (up to 7.1)
+        and large information ratios (up to 10.2)
+        while keeping the turnover well below 0.2 in all cases.
+    The method used to generate these portfolios is presented in
+        the remainder of this report.
 
     \begin{figure}[t]
         \centerline{\includegraphics[width=1.8\textwidth]{result.png}}
@@ -82,6 +87,11 @@
     \end{table}
 
  \clearpage
+
+
+\section{Portfolio-creation strategy}
+
+
 \section{Finding the near-optimal forward-biased portfolio}
 
 \subsection{Problem statement}
@@ -96,7 +106,7 @@
     where for an $m$ stocks by $n$ days portfolio,
         \BI $x \in \reals^{mn}$ is a vector representing the portfolio,
         \I  $c$, $a$, $A$, $B$ and $C$ are appropriate vector, scalar, 
-            or matrix quantities (see \verb+sim_matrices.m+), and
+            or matrix quantities (see \verb+simulation_matrices.m+), and
         \I  $f_{ir}, f_{ret}, f_{tvr}, f_{t} \in \reals^{mn} \to \reals$
             where $f_{t}$ is an approximation of the turnover function, 
             $f_{tvr}$. \EI
@@ -178,12 +188,74 @@
         in order to force $f_{tvr}(x) \le 0.2$.
     
     We have now simplified \eq{original problem} into the following convex form
-    \EE{convex problem}{
+    \EE{}{
         \minimize& (-1/\mu)c^T x + \std(Ax) \\
         \subto& \norm{Bx}_1 \le 0.2 \\
             & \norm{x}_1 \le 1
     }
-    
+        which can then be further approximated as 
+    \EE{convex problem}{
+        \minimize& (-1/\mu)c^T x + \std(Ax) \\
+        \subto& \norm{Bx}_2 \le 0.2 \\
+            & \norm{x}_2 \le 1
+    }
+        if desired for stability purposes.
+
+\subsection{Solution method}
+    We use the CVX package\footnote{\url{www.cvxr.com/cvx}} to solve 
+        \eq{convex problem}, which takes about 5 minutes on a desktop computer
+        for the problem size given.
+
+    Note that because the problem in \eq{convex problem} is convex
+        the global minimum can deterministically and efficiently be found.
+    Furthermore, once found the optimal point can be proven to be globally
+        optimal.
+
+    It is from this that we claim that the result of \eq{convex problem}
+        would be optimal, if not for the two approximations used earlier.
+    However, we also note that such a portfolio would be forward-biased,
+        since the entire price history is available 
+        to the optimization program.
+
+    Lastly, we note that the use of a simple algorithm, such as bisection,
+        can be coupled with this solution method
+        in order to yield portfolios with an exact turnover 
+        as decided by the user.
+
+\section{Computing the reduced-order model}   
+
+    Although the portfolio obtained 
+        via the method presented in the previous section
+        would not be valid because of forward-biasing,
+        it is extremely useful in building a reduced-order model
+        for creating a portfolio that is backward-biased only.
+    The full-order version of this model, $M$, is computed via
+    \EE{}{
+        MY =& X_\text{FB} \\
+        M =& X_\text{FB}Y^+}
+    where for an $m$ stocks and $n$ days portfolio,
+        \BI $M \in \reals^{m \times p}$ is the full-order model matrix,
+        \I  $Y \in \reals^{p \times n}$ is the signals matrix 
+            which contains the backwards-looking signals 
+            (e.g. percent returns for past 5 days)
+            which are fed into the model,
+        \I  $Y^+ \in \reals^{n \times p}$ is the pseudo-inverse of $Y$,
+        \I  $X_\text{FB} \in \reals^{m \times n}$ is the matrix representing 
+            the near-optimal portfolio obtained from the previous section.
+            Note that we now use a matrix convention for convenience. \EI
+
+    To obtain a reduced $q$-order model, 
+        we simply take the $q$ most significant singular components of $M$
+        which can be computed via a singular value decomposition of $M$,
+    \EE{}{
+        M =& U\Sigma V^T = U \text{diag}(\sigma) V^T \\
+        M_q =& u_1 \sigma_1 v_1^T + u_2 \sigma_2 v_2^T + \cdots + u_q \sigma_q v_q^T.}
+    In this way, the reduced-order modeling matrix, $M_q$,
+        has the same shape as $M$, but is only of order $q$.
+    Thus, we say that $M_q$ is a model with $q$ signals,
+        and when used, creates a $q$-signal portfolio.
+
+\section{Conclusion}
     
 
 \end{document}

@@ -7,8 +7,23 @@
 \author{Jesse Lu}
 \begin{document}
 \maketitle
+\tableofcontents
 
 \section{Main result: Quasi pareto-optimal portfolios}
+
+    The main result of this project is the production of 
+        eight portfolio groups with reduced turnover.
+    What makes each portfolio group unique is the number of signals
+        used to generate the portfolios in each group;
+        for this project this was varied from 1 to 128 signals.
+    Furthermore, within a portfolio group, 
+        each portfolio is distinguished by its emphasis on maximizing
+        either the annualized return, or information ratio.
+    These results are presented in figure~\ref{result},
+        as well as tables~\ref{table:ret}-\ref{table:tvr}.
+
+    Surprisingly, these 
+
     \begin{figure}[t]
         \centerline{\includegraphics[width=1.8\textwidth]{result.png}}
         \caption{The main result of the project: 
@@ -24,8 +39,9 @@
             }
         \label{result}
     \end{figure}
+    \clearpage
 
-    \begin{table}\centering
+    \begin{table}[t]\centering
         \begin{tabular}{l c c c c c c c c}
         $n_\text{signals}$ & 1 & 2 & 4 & 8 & 16 & 32 & 64 & 128  \\ \hline
         & 4.519 & 4.548 & 4.591 & 4.819 & 5.501 & 6.271 & 6.848 & 7.182  \\
@@ -38,7 +54,7 @@
         \label{table:ret}
     \end{table}
 
-    \begin{table}\centering
+    \begin{table}[t]\centering
         \begin{tabular}{l c c c c c c c c}
         $n_\text{signals}$ & 1 & 2 & 4 & 8 & 16 & 32 & 64 & 128  \\ \hline
         & 0.348 & 0.375 & 0.425 & 0.513 & 0.641 & 0.739 & 0.801 & 0.837  \\
@@ -52,7 +68,7 @@
     \end{table}
 
 
-    \begin{table}\centering
+    \begin{table}[t]\centering
         \begin{tabular}{l c c c c c c c c}
         $n_\text{signals}$ & 1 & 2 & 4 & 8 & 16 & 32 & 64 & 128  \\ \hline
         & 0.163 & 0.159 & 0.151 & 0.142 & 0.148 & 0.163 & 0.175 & 0.183  \\

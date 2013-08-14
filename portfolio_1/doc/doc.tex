@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{amsmath}
+\input defs.tex
+
+\title{Project Report}
+\author{Jesse Lu}
+\begin{document}
+\maketitle
+
+\section{Finding the near-optimal forward-biased portfolio}
+
+\subsection{Problem statement}
+    The portfolio optimization problem can be simplified 
+        by substituting expressions for the relevant terms in the following way
+        (implemented in \verb+simulate_X.m+):
+    \EE{}{
+        f_{ir}(x) &= \frac{c^T x}{\std(Ax)} \\
+        f_{ret}(x) &= a \frac{c^T x}{\norm{x}_1} \\
+        f_{tvr}(x) &= \mean\frac{C|Bx|}{C|x|} \\
+        f_{t}(x) &= \frac{\norm{Bx}_1}{\norm{x}_1}} 
+    where for an $m$ stocks by $n$ days portfolio,
+        \BI $x \in \reals^{mn}$ is a vector representing the portfolio,
+        \I  $c$, $a$, $A$, $B$ and $C$ are appropriate vector, scalar, 
+            or matrix quantities (see \verb+sim_matrices.m+), and
+        \I  $f_{ir}, f_{ret}, f_{tvr}, f_{t} \in \reals^{mn} \to \reals$
+            where $f_{t}$ is an approximation of the turnover function, 
+            $f_{tvr}$. \EI
+
+    The problem we want to solve is then
+    \EE{original problem}{
+        \minimize& - f_{ret}(x) - \hat{\mu}f_{ir}(x) \\
+        \subto& f_{tvr}(x) \le 0.2
+    }
+    That is to say, maximize the return and information ratio
+        (with relative proportion affected by coefficient $\hat{\mu}$)
+        while keeping the turnover below $0.2$.
+
+
+    Note that for brevity, I have not included the expressions for 
+        $c$, $a$, $A$, $B$ and $C$; 
+        however, one can deduce that such quantities must exist.
+    For example, notice that $c^T x$ represents the total profit/loss;
+        we know this expression must be valid for some $c$ 
+        since the expression for the total profit/loss is linear.
+    Lastly, notice that the portfolio is represented as a vector ($x$),
+        rather than a matrix, in this section for notational convenience.
+
+\subsection{Problem simplification}
+    We now simplify \eq{original problem} in order 
+        to make it computationally tractable.
+
+    We first note that \eq{original problem} is homogenous,
+        meaning that it's solution depends only on the relative values of $x$.
+    Therefore we can split the terms of $f_{tvr}(x)$ in the following way
+        without loss of generality.
+    \EE{}{
+        \minimize& - f_{ret}(x) - \hat{\mu}f_{ir}(x) \\
+        \subto& \norm{Bx}_1 \le 0.2 \\
+            & \norm{x}_1 = 1
+    }
+
+    Turning our attention to the objective function we note that
+    \E{}{
+        f_{ret}(x) + \hat{\mu}f_{ir}(x) = 
+            \frac{c^T x}{\std(Ax)} + \hat{\mu} a c^T x}
+        since $\norm{x}_1 = 1$.
+    This objective can be thought of as 
+        weighting two terms by $\hat{\mu}$;
+        and we can alternatively weight the following two terms
+    \E{}{
+        \frac{c^T x}{\std(Ax)} + \hat{\mu} a c^T x \to 
+            (1/\mu)c^T x - \std(Ax)}
+        while still obtaining the full range of pareto-optimal points;
+        although the connection between $\mu$ and $\hat{\mu}$
+        is not immediately clear.
+
+    This now gives us
+    \EE{}{
+        \minimize& (-1/\mu)c^T x + \std(Ax) \\
+        \subto& \norm{Bx}_1 \le 0.2 \\
+            & \norm{x}_1 = 1
+    }
+        which is still completely equivalent to \eq{original formulation}.
+
+    We now implement the following generalization
+    \E{}{   \norm{x}_1 = 1 \quad\to\quad \norm{x}_1 \le 1}
+        in order to make the problem 
+        convex\footnote{see Boyd and Vandenberghe, ``Convex Optimization''}.
+    Our reasoning behind this approximation
+        is that although $\norm{x}_1$ is no longer 
+        strictly confined to the value of 1,
+        it most likely will end up with a quantity of 1 anyways
+        because the $c^T x$ term in the objective function will always want
+        to ``push'' $\norm{x}_1$ to as large a value as possible.
+
+    While this approximation does inject error into our formulation,
+        the benefits of convexity (i.e. the ability to efficiently compute
+        the global minimum) far outweigh the costs.
+    Actually, the cost of this approximation can be made negligible by
+        twiddling the value of $0.2$ 
+        in the $\norm{Bx}_1 \le 0.2$ constraint 
+        (using a simple algorithm like bisection for instance)
+        in order to force $f_{tvr}(x) \le 0.2$.
+    
+    We have now simplified \eq{original problem} into the following convex form
+    \EE{convex problem}{
+        \minimize& (-1/\mu)c^T x + \std(Ax) \\
+        \subto& \norm{Bx}_1 \le 0.2 \\
+            & \norm{x}_1 \le 1
+    }
+    
+    
+
+\end{document}

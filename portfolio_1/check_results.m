@@ -53,6 +53,33 @@ function check_results(prices, simulate_fun)
 
         simulate_fun(prices, portfolio);
         fprintf('\n');
+
+        % Do some plotting to get a feel for what the portfolio is doing.
+        figure(i);
+
+        subplot 211; imagesc(portfolio, [-.002 .002]); 
+        title(sprintf('Portfolio #%d positions', i));
+
+        subplot 413; plot(sum(percent_return .* portfolio, 1));
+        axis([1 252 -0.05 0.05]);
+        hold on
+        plot([1 252], [0 0], 'k--');
+        hold off
+        ylabel('Daily profit/loss');
+
+        subplot 414; 
+        yesterday_portfolio = circshift(portfolio, [0 1]);
+        yesterday_portfolio(:,1) = 0;
+        plot(sum(abs(portfolio-yesterday_portfolio),1) ./ ...
+                                    sum(abs(portfolio),1));
+        axis([1 252 0 0.5]);
+        hold on
+        plot([1 252], [0.2 0.2], 'k--');
+        hold off
+        ylabel('Daily turnover');
+
+        drawnow;
+
     end
 
 

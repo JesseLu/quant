@@ -23,7 +23,7 @@ function [ir, ret, tvr] = simulate_portfolio(X)
     X_m1 = circshift(X, [0 1]);
     X_m1(:, 1) = 0;
     dollars_traded = sum(abs(X - X_m1), 1);
-    daily_tvr = dollars_traded / 2 / booksize;
+    daily_tvr = (dollars_traded / 2) ./ booksize;
     tvr = mean(daily_tvr);
 
 	fprintf('ir: %1.3f, ret: %1.3f, tvr: %1.3f\n', ir, ret, tvr);

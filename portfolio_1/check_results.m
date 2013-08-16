@@ -1,7 +1,7 @@
 %% check_results
 % Demonstration in an attempt to validate claims of no forward-biasing.
 
-function check_results(prices)
+function check_results(prices, simulate_fun)
 
     % Obtain the daily percent returns.
     yesterday_prices = circshift(prices, [0 1]);
@@ -10,11 +10,11 @@ function check_results(prices)
     percent_return(~isfinite(percent_return)) = 0;
 
     % Get the demonstration models.
-    M = getfield(load('demo_models.mat'), M_demo);
+    M = getfield(load('demo_models.mat'), 'M_demo');
     fprintf('Demonstrating %d portfolios...\n\n', numel(M));
 
     for i = 1 : numel(M)
-        fprintf('Portfolio %d/%d\n===\n', i, numel(M));
+        fprintf('Portfolio %d/%d\n=============\n', i, numel(M));
 
         % Get the modeling matrix.
         U = M{i}{1};
@@ -36,12 +36,23 @@ function check_results(prices)
         %
         % This is then a strong guarantee of there being only backward bias.
 
+        portfolio = zeros(size(prices)); % Empty intial portfolio.
+
         for j = 1 : size(percent_return, 2)
             % Get past 5 days of percent returns, filling in zeros if needed.
             five_day_hist = percent_return(:,j:-1:max([1, j-4])); 
             five_day_hist = [five_day_hist, ...
                         zeros(size(five_day_hist,1), 5-size(five_day_hist,2))];
+
+            % For each day, create its portfolio based on the model, which is
+            % constant for each day, and the 5-day history.
+            portfolio(:,j) = U * S * (V' * five_day_hist(:)); 
         end
+
+        portfolio(:,1) = M0(:,1); % Set initial portfolio on day 1.
+
+        simulate_fun(prices, portfolio);
+        fprintf('\n');
     end
 
 

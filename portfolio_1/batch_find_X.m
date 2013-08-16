@@ -3,7 +3,7 @@
 % for various numbers of signals.
 % Should be used in conjuction with batch_solve_Xfb.
 
-function [X, f_ir, f_ret, f_tvr] = batch_find_X(mu, X_fb, time_window, tvr0)
+function [f_ir, f_ret, f_tvr, X, M] = batch_find_X(mu, X_fb, time_window, tvr0)
 
     % Generate the non-forward-biased signals.
     % Our model is guaranteed to be only backward-biased since these signals
@@ -20,7 +20,7 @@ function [X, f_ir, f_ret, f_tvr] = batch_find_X(mu, X_fb, time_window, tvr0)
     % portfolios based on them.
     for i = 1 : length(X_fb)
         % Compute a backward-biased model from each forward-biased portfolio.
-        [M, U, S, V, M0] = solve_M(X_fb{i}, Y);
+        [~, U, S, V, M0] = solve_M(X_fb{i}, Y);
 
         % Use various reduced-signal versions of the model to 
         % generate backward-biased portfolios.
@@ -36,6 +36,7 @@ function [X, f_ir, f_ret, f_tvr] = batch_find_X(mu, X_fb, time_window, tvr0)
             nsig(i,j) = q(j);
             m(i,j) = mu(i);
             X_hist{i,j} = X1;
+            M_hist{i,j} = {U(:,k), S(k,k), V(:,k), M0};
         end
     end
 
@@ -60,6 +61,7 @@ function [X, f_ir, f_ret, f_tvr] = batch_find_X(mu, X_fb, time_window, tvr0)
             f_ret(i,j) = ret(f_ind);
             f_ir(i,j) = ir(f_ind);
             X(i,j) = X_hist(f_ind);
+            M(i,j) = M_hist(f_ind);
         end
     end
 
